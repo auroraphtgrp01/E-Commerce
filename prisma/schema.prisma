@@ -1,0 +1,303 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String         @id @default(uuid()) @db.Uuid
+  name         String
+  email        String         @unique
+  password     String
+  phone        String
+  gender       String
+  dateOfBirth  DateTime
+  refreshToken String
+  roles        String
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  deletedAt    DateTime?
+  isDeleted    Boolean        @default(false)
+  createdBy    Json?
+  updatedBy    Json?
+  deletedBy    Json?
+  Agency       Agency?
+  Customer     Customer?
+  Notification Notification[]
+  Rating       Rating[]
+  Cart         Cart[]
+  Order        Order[]
+  Image        Image[]
+}
+
+model Agency {
+  id             String     @id @default(uuid()) @db.Uuid
+  users          User       @relation(fields: [userId], references: [id])
+  userId         String     @unique @db.Uuid
+  pickup_address String
+  paymentCard    String[]
+  shopName       String
+  taxCode        String
+  citizenId      String
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+  deletedAt      DateTime?
+  isDeleted      Boolean    @default(false)
+  createdBy      Json?
+  updatedBy      Json?
+  deletedBy      Json?
+  Rating         Rating[]
+  Cart           Cart[]
+  CartItem       CartItem[]
+}
+
+model Customer {
+  id          String    @id @default(uuid()) @db.Uuid
+  users       User      @relation(fields: [userId], references: [id])
+  userId      String    @unique @db.Uuid
+  paymentCard String[]
+  address     String[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+  isDeleted   Boolean   @default(false)
+  createdBy   Json?
+  updatedBy   Json?
+  deletedBy   Json?
+}
+
+model Role {
+  id          String    @id @default(uuid()) @db.Uuid
+  name        String
+  description String
+  isActive    Boolean
+  permissions String[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+  isDeleted   Boolean   @default(false)
+  createdBy   Json?
+  updatedBy   Json?
+  deletedBy   Json?
+}
+
+model Permission {
+  id          String    @id @default(uuid()) @db.Uuid
+  name        String
+  path        String
+  method      String
+  description String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+  isDeleted   Boolean   @default(false)
+  createdBy   Json?
+  updatedBy   Json?
+  deletedBy   Json?
+}
+
+model Notification {
+  id        String    @id @default(uuid()) @db.Uuid
+  user      User      @relation(fields: [userId], references: [id])
+  userId    String    @unique @db.Uuid
+  title     String
+  content   String
+  status    String // Unread - Read
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+  isDeleted Boolean   @default(false)
+  createdBy Json?
+  updatedBy Json?
+  deletedBy Json?
+}
+
+model Product {
+  id          String     @id @default(uuid()) @db.Uuid
+  name        String
+  slug        String
+  categories  Category   @relation(fields: [categoryId], references: [id])
+  imageId     String     @unique @db.Uuid
+  categoryId  String     @unique @db.Uuid
+  detail      String[]
+  description String
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  deletedAt   DateTime?
+  isDeleted   Boolean    @default(false)
+  createdBy   Json?
+  updatedBy   Json?
+  deletedBy   Json?
+  Rating      Rating[]
+  Cart        Cart[]
+  Variant     Variant[]
+  CartItem    CartItem[]
+}
+
+model Variant {
+  id         String   @id @default(uuid()) @db.Uuid
+  color      String
+  type       String
+  size       String
+  price      Float
+  quantities Int
+  idImg      String   @unique @db.Uuid
+  idProduct  String   @unique @db.Uuid
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  createdBy  String
+  updatedBy  String
+  isDeleted  Boolean
+  deletedBy  String
+  productId  String?  @db.Uuid
+  Product    Product? @relation(fields: [productId], references: [id])
+}
+
+model Category {
+  id          String    @id @default(uuid()) @db.Uuid
+  name        String
+  slug        String
+  description String
+  imageId     String    @unique @db.Uuid
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+  isDeleted   Boolean   @default(false)
+  createdBy   Json?
+  updatedBy   Json?
+  deletedBy   Json?
+  Product     Product[]
+}
+
+model Image {
+  id          String    @id @default(uuid()) @db.Uuid
+  path        String
+  description String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+  isDeleted   Boolean   @default(false)
+  createdBy   Json?
+  updatedBy   Json?
+  deletedBy   Json?
+  User        User?     @relation(fields: [userId], references: [id])
+  userId      String?   @unique @db.Uuid
+}
+
+model Rating {
+  id        String    @id @default(uuid()) @db.Uuid
+  user      User      @relation(fields: [userId], references: [id])
+  userId    String    @unique @db.Uuid
+  product   Product?  @relation(fields: [productId], references: [id])
+  productId String    @unique @db.Uuid
+  agency    Agency?   @relation(fields: [agencyId], references: [id])
+  agencyId  String    @unique @db.Uuid
+  rating    Int
+  comment   String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+  isDeleted Boolean   @default(false)
+  createdBy Json?
+  updatedBy Json?
+  deletedBy Json?
+}
+
+model Cart {
+  id             String           @id @default(uuid()) @db.Uuid
+  user           User             @relation(fields: [userId], references: [id])
+  userId         String           @unique @db.Uuid
+  product        Product          @relation(fields: [productId], references: [id])
+  productId      String           @unique @db.Uuid
+  agency         Agency?          @relation(fields: [agencyId], references: [id])
+  agencyId       String           @unique @db.Uuid
+  items          CartItem[]
+  quantity       Int
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  deletedAt      DateTime?
+  isDeleted      Boolean          @default(false)
+  createdBy      Json?
+  updatedBy      Json?
+  deletedBy      Json?
+  Order          Order?           @relation(fields: [orderId], references: [id])
+  orderId        String?          @db.Uuid
+  DeliveryDetail DeliveryDetail[]
+}
+
+model CartItem {
+  id        String    @id @default(uuid()) @db.Uuid
+  product   Product   @relation(fields: [productId], references: [id])
+  productId String    @unique @db.Uuid
+  agency    Agency?   @relation(fields: [agencyId], references: [id])
+  agencyId  String    @unique @db.Uuid
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+  isDeleted Boolean   @default(false)
+  createdBy Json?
+  updatedBy Json?
+  deletedBy Json?
+  Cart      Cart?     @relation(fields: [cartId], references: [id])
+  cartId    String?   @unique @db.Uuid
+}
+
+model Order {
+  id            String    @id @default(uuid()) @db.Uuid
+  user          User      @relation(fields: [userId], references: [id])
+  userId        String    @unique @db.Uuid
+  carts         Cart[]
+  payment       String
+  totalPrice    String
+  deliveryPrice String
+  productPrice  String
+  status        String
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  deletedAt     DateTime?
+  isDeleted     Boolean   @default(false)
+  createdBy     Json?
+  updatedBy     Json?
+  deletedBy     Json?
+}
+
+model Delivery {
+  id             String           @id @default(uuid()) @db.Uuid
+  name           String
+  description    String
+  price          String
+  deliveryTime   String
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  deletedAt      DateTime?
+  isDeleted      Boolean          @default(false)
+  createdBy      Json?
+  updatedBy      Json?
+  deletedBy      Json?
+  DeliveryDetail DeliveryDetail[]
+}
+
+model DeliveryDetail {
+  id         String    @id @default(uuid()) @db.Uuid
+  delivery   Delivery  @relation(fields: [deliveryId], references: [id])
+  deliveryId String    @unique @db.Uuid
+  cart       Cart      @relation(fields: [cartId], references: [id])
+  cartId     String    @unique @db.Uuid
+  orderId    String    @unique @db.Uuid
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  deletedAt  DateTime?
+  isDeleted  Boolean   @default(false)
+  createdBy  Json?
+  updatedBy  Json?
+  deletedBy  Json?
+}
