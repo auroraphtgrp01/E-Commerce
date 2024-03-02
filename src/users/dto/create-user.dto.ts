@@ -1,8 +1,8 @@
-import { IsDate, IsDateString, IsEmail, IsEmpty, IsNotEmpty } from 'class-validator'
+import { IsDate, IsDateString, IsEmail, IsEmpty, IsNotEmpty, IsOptional } from 'class-validator'
 import mongoose from 'mongoose'
 import { MESSAGES_RESPONSE } from 'src/constants/messages'
 
-export class CreateUserDto {}
+export class CreateUserDto { }
 
 export class RegisterCustomer {
   @IsEmail({}, { message: MESSAGES_RESPONSE.INVALID_EMAIL })
@@ -27,13 +27,24 @@ export class RegisterCustomer {
 
 export class RegisterAgency {
   @IsNotEmpty({ message: MESSAGES_RESPONSE.PICKUP_ADDRESS_IS_REQUIRED })
-  pickup_address: string
+  pickupAddress: string
   @IsNotEmpty({ message: MESSAGES_RESPONSE.SHOP_NAME_IS_REQUIRED })
-  shop_name: string
+  shopName: string
   @IsNotEmpty({ message: MESSAGES_RESPONSE.TAX_CODE_IS_REQUIRED })
-  tax_code: string
+  taxCode: string
   @IsNotEmpty({ message: MESSAGES_RESPONSE.CITIZEN_ID_IS_REQUIRED })
-  citizen_id: string
+  citizenId: string
   @IsNotEmpty({ message: MESSAGES_RESPONSE.ID_USERS_IS_REQUIRED })
-  id_users: mongoose.Schema.Types.ObjectId
+  userId: string
+}
+
+export class AddressDto {
+  @IsNotEmpty({ message: MESSAGES_RESPONSE.ADDRESS_IS_REQUIRED })
+  address: string
+  @IsNotEmpty({ message: MESSAGES_RESPONSE.NAME_IS_REQUIRED })
+  name: string
+  @IsOptional()
+  description: string
+  @IsNotEmpty({ message: MESSAGES_RESPONSE.ID_USERS_IS_REQUIRED })
+  userId: string
 }

@@ -40,39 +40,77 @@ model User {
 }
 
 model Agency {
-  id             String     @id @default(uuid()) @db.Uuid
-  users          User       @relation(fields: [userId], references: [id])
-  userId         String     @unique @db.Uuid
-  pickup_address String?
-  paymentCard    String[]
-  shopName       String?
-  taxCode        String?
-  citizenId      String?
-  createdAt      DateTime   @default(now())
-  updatedAt      DateTime   @updatedAt
-  deletedAt      DateTime?
-  isDeleted      Boolean    @default(false)
-  createdBy      Json?
-  updatedBy      Json?
-  deletedBy      Json?
-  Rating         Rating[]
-  Cart           Cart[]
-  CartItem       CartItem[]
+  id            String        @id @default(uuid()) @db.Uuid
+  users         User          @relation(fields: [userId], references: [id])
+  userId        String        @unique @db.Uuid
+  pickupAddress Address[]
+  paymentCard   PaymentCard[]
+  shopName      String
+  taxCode       String
+  citizenId     String
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  deletedAt     DateTime?
+  isDeleted     Boolean       @default(false)
+  createdBy     Json?
+  updatedBy     Json?
+  deletedBy     Json?
+  Rating        Rating[]
+  Cart          Cart[]
+  CartItem      CartItem[]
 }
 
 model Customer {
-  id          String    @id @default(uuid()) @db.Uuid
-  users       User      @relation(fields: [userId], references: [id])
-  userId      String    @unique @db.Uuid
-  paymentCard String[]
-  address     String[]
-  createdAt   DateTime? @default(now())
-  updatedAt   DateTime? @updatedAt
+  id          String        @id @default(uuid()) @db.Uuid
+  users       User          @relation(fields: [userId], references: [id])
+  userId      String        @unique @db.Uuid
+  paymentCard PaymentCard[]
+  createdAt   DateTime?     @default(now())
+  updatedAt   DateTime?     @updatedAt
   deletedAt   DateTime?
-  isDeleted   Boolean?  @default(false)
+  isDeleted   Boolean?      @default(false)
   createdBy   Json?
   updatedBy   Json?
   deletedBy   Json?
+  Address     Address[]
+}
+
+model PaymentCard {
+  id          String    @id @default(uuid()) @db.Uuid
+  name        String
+  description String
+  cardNumber  String
+  ccv         String
+  dueDate     DateTime
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+  isDeleted   Boolean   @default(false)
+  createdBy   Json?
+  updatedBy   Json?
+  deletedBy   Json?
+  Customer    Customer? @relation(fields: [customerId], references: [id])
+  customerId  String?   @db.Uuid
+  Agency      Agency?   @relation(fields: [agencyId], references: [id])
+  agencyId    String?   @db.Uuid
+}
+
+model Address {
+  id          String    @id @default(uuid()) @db.Uuid
+  name        String
+  address     String
+  description String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+  isDeleted   Boolean   @default(false)
+  createdBy   Json?
+  updatedBy   Json?
+  deletedBy   Json?
+  Customer    Customer? @relation(fields: [customerId], references: [id])
+  customerId  String?   @db.Uuid
+  Agency      Agency?   @relation(fields: [agencyId], references: [id])
+  agencyId    String?   @db.Uuid
 }
 
 model Role {

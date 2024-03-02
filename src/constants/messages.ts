@@ -15,5 +15,6 @@ export const MESSAGES_RESPONSE = {
   SHOP_NAME_IS_REQUIRED: 'Shop name is required',
   TAX_CODE_IS_REQUIRED: 'Tax code is required',
   CITIZEN_ID_IS_REQUIRED: 'Citizen id is required',
-  ID_USERS_IS_REQUIRED: 'Id users is required'
+  ID_USERS_IS_REQUIRED: 'Id users is required',
+  ADDRESS_IS_REQUIRED: 'Address is required',
 }

@@ -30,8 +30,6 @@ export const queryDatabaseWithFilter = async (queryString: string, modelQuery: a
             keySort = Object.keys(sort).toString()
         }
     }
-    console.log(population);
-
     const populate = population
         ? population.reduce((acc: object, curr: PopulateOptions) => {
             acc[curr.path.trim()] = true
