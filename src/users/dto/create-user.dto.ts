@@ -21,9 +21,8 @@ export class RegisterCustomer {
   @IsNotEmpty({ message: MESSAGES_RESPONSE.GENDER_IS_REQUIRED })
   gender: string
 
-  @IsNotEmpty({ message: MESSAGES_RESPONSE.DATE_OF_BIRTH_IS_REQUIRED })
   @IsDateString({}, { message: MESSAGES_RESPONSE.DATE_OF_BIRTH_IS_INVALID })
-  date_of_birth: Date
+  dateOfBirth: Date
 }
 
 export class RegisterAgency {

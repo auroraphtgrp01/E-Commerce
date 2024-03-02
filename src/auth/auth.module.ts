@@ -10,12 +10,6 @@ import { JwtStrategy } from './passports/jwt.strategy'
 
 @Module({
   imports: [
-    MongooseModule.forFeature([
-      {
-        name: User.name,
-        schema: UserSchema
-      }
-    ]),
     JwtModule.registerAsync({
       useFactory: async (configService: ConfigService) => ({
         secret: configService.get<string>('ACCESS_TOKEN_SECRET'),

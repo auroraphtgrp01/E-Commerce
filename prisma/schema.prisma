@@ -21,12 +21,12 @@ model User {
   phone        String
   gender       String
   dateOfBirth  DateTime
-  refreshToken String
-  roles        String
-  createdAt    DateTime       @default(now())
-  updatedAt    DateTime       @updatedAt
+  refreshToken String?
+  roles        String?
+  createdAt    DateTime?      @default(now())
+  updatedAt    DateTime?      @updatedAt
   deletedAt    DateTime?
-  isDeleted    Boolean        @default(false)
+  isDeleted    Boolean?       @default(false)
   createdBy    Json?
   updatedBy    Json?
   deletedBy    Json?
@@ -43,11 +43,11 @@ model Agency {
   id             String     @id @default(uuid()) @db.Uuid
   users          User       @relation(fields: [userId], references: [id])
   userId         String     @unique @db.Uuid
-  pickup_address String
+  pickup_address String?
   paymentCard    String[]
-  shopName       String
-  taxCode        String
-  citizenId      String
+  shopName       String?
+  taxCode        String?
+  citizenId      String?
   createdAt      DateTime   @default(now())
   updatedAt      DateTime   @updatedAt
   deletedAt      DateTime?
@@ -66,10 +66,10 @@ model Customer {
   userId      String    @unique @db.Uuid
   paymentCard String[]
   address     String[]
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  createdAt   DateTime? @default(now())
+  updatedAt   DateTime? @updatedAt
   deletedAt   DateTime?
-  isDeleted   Boolean   @default(false)
+  isDeleted   Boolean?  @default(false)
   createdBy   Json?
   updatedBy   Json?
   deletedBy   Json?
