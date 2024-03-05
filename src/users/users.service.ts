@@ -1,26 +1,28 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common'
+import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common'
 import { AddressDto, RegisterAgency, RegisterCustomer } from './dto/create-user.dto'
 import { UpdateAgencyDto, UpdateUserDto } from './dto/update-user.dto'
 import { hashPassword } from 'src/utils/hashPassword'
-import { PrismaServie } from 'src/services/prisma.service'
-import { IQueryParamsUser } from 'src/dto_customize/QueryParams.dto'
 import aqp from 'api-query-params'
 import { PopulateOptions } from 'mongoose'
 import { queryDatabaseWithFilter } from 'src/utils/queryDatabase'
+import { PrismaClient } from '@prisma/client'
+import { CustomPrismaService } from 'nestjs-prisma'
+import { ExtendedPrismaClient } from 'src/services/prisma_customize.service'
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly prismaService: PrismaServie) { }
+  constructor(@Inject('PrismaService')
+  private prismaService: CustomPrismaService<ExtendedPrismaClient>) { }
 
   async register(registerCustomer: RegisterCustomer) {
-    const isExist = await this.prismaService.user.findUnique({
+    const isExist = await this.prismaService.client.user.findUnique({
       where: {
         email: registerCustomer.email
       }
     })
     if (isExist) throw new HttpException('Email already exists', HttpStatus.BAD_REQUEST)
     const hashP = await hashPassword(registerCustomer.password)
-    const result = await this.prismaService.user.create({
+    const result = await this.prismaService.client.user.create({
       data: {
         ...registerCustomer,
         password: hashP
@@ -33,13 +35,13 @@ export class UsersService {
         gender: true
       }
     })
-    const isValid = await this.prismaService.customer.findUnique({
+    const isValid = await this.prismaService.client.customer.findUnique({
       where: {
         userId: result.id
       }
     })
     if (isValid) throw new HttpException('Customer already exists', HttpStatus.BAD_REQUEST)
-    await this.prismaService.customer.create({
+    await this.prismaService.client.customer.create({
       data: {
         userId: result.id
       }
@@ -51,7 +53,7 @@ export class UsersService {
   }
 
   async registerAgency(registerAgency: RegisterAgency) {
-    const isValid = await this.prismaService.user.findUnique({
+    const isValid = await this.prismaService.client.user.findUnique({
       where: {
         id: registerAgency.userId
       }, select: {
@@ -65,12 +67,12 @@ export class UsersService {
     const pickupAddress = registerAgency.pickupAddress
     delete registerAgency.pickupAddress
     if (!isValid) throw new HttpException('User not found - Please Register a new User to Register Agency !', HttpStatus.UNAUTHORIZED)
-    const result = await this.prismaService.agency.create({
+    const result = await this.prismaService.client.agency.create({
       data: {
         ...registerAgency as any
       }
     })
-    await this.prismaService.address.create({
+    await this.prismaService.client.address.create({
       data: {
         agencyId: result.id,
         address: pickupAddress,
@@ -85,15 +87,15 @@ export class UsersService {
   }
 
   async findAll(queryString: string) {
-    const result = await queryDatabaseWithFilter(queryString, this.prismaService.user)
+    const result = await queryDatabaseWithFilter(queryString, this.prismaService.client.user)
     return {
       message: 'Data fetched successfully',
-      data: result
+      result
     }
   }
 
   async findOne(id: string) {
-    const result = await this.prismaService.user.findUnique({
+    const result = await this.prismaService.client.user.findUnique({
       where: {
         id
       },
@@ -105,13 +107,13 @@ export class UsersService {
     })
     return {
       message: 'Data fetched successfully',
-      data: (delete result.password, result)
+      data: (delete result?.password, result)
     }
   }
 
   async update(id: string, updateUserDto: UpdateUserDto) {
     delete updateUserDto.password
-    const user = await this.prismaService.user.update({
+    const user = await this.prismaService.client.user.update({
       where: {
         id: id
       },
@@ -125,13 +127,13 @@ export class UsersService {
     }
   }
   async updateAgency(id, updateAgencyDto: UpdateAgencyDto, userId: string) {
-    // const user = await this.prismaService.user.findUnique({
+    // const user = await this.prismaService.client.user.findUnique({
     //   where: {
     //     id: userId
     //   }
     // })
     // if (!user) throw new HttpException('User not found', HttpStatus.UNAUTHORIZED)
-    const result = await this.prismaService.agency.update({
+    const result = await this.prismaService.client.agency.update({
       where: {
         id
       }, data: {
@@ -143,12 +145,9 @@ export class UsersService {
       data: result
     }
   }
-  remove(id: number) {
-    return `This action removes a #${id} user`
-  }
 
   async findUserByEmail(email: string) {
-    const user = await this.prismaService.user.findUnique({
+    const user = await this.prismaService.client.user.findUnique({
       where: {
         email
       }
@@ -159,7 +158,7 @@ export class UsersService {
     const { filter } = aqp(queryString)
     let result
     if (filter.types === 'agency') {
-      result = await this.prismaService.address.findMany({
+      result = await this.prismaService.client.address.findMany({
         where: {
           agencyId: id
         },
@@ -171,7 +170,7 @@ export class UsersService {
       })
     }
     if (filter.types === 'customer') {
-      result = await this.prismaService.address.findMany({
+      result = await this.prismaService.client.address.findMany({
         where: {
           customerId: id
         },
@@ -192,7 +191,7 @@ export class UsersService {
     const userId = addressDto.userId
     delete addressDto.userId
     if (filter.types === 'agency') {
-      const result = await this.prismaService.address.create({
+      const result = await this.prismaService.client.address.create({
         data: {
           ...addressDto,
           agencyId: userId
@@ -204,7 +203,7 @@ export class UsersService {
       }
     }
     if (filter.types === 'customer') {
-      const result = await this.prismaService.address.create({
+      const result = await this.prismaService.client.address.create({
         data: {
           ...addressDto,
           customerId: userId
@@ -222,7 +221,7 @@ export class UsersService {
     const userId = addressDto.userId
     delete addressDto.userId
     if (filter.types === 'agency') {
-      const result = await this.prismaService.address.updateMany({
+      const result = await this.prismaService.client.address.updateMany({
         where: {
           AND: [
             {
@@ -243,7 +242,7 @@ export class UsersService {
       }
     }
     if (filter.types === 'customer') {
-      const result = await this.prismaService.address.updateMany({
+      const result = await this.prismaService.client.address.updateMany({
         where: {
           AND: [
             {
@@ -263,5 +262,40 @@ export class UsersService {
         data: result
       }
     }
+    throw new HttpException('Invalid type', HttpStatus.BAD_REQUEST)
+  }
+
+  async removeUser(id: string) {
+    const [customer, agency] = await Promise.all([
+      this.prismaService.client.customer.findUnique({
+        where: {
+          userId: id
+        }
+      }),
+      this.prismaService.client.agency.findUnique({
+        where: {
+          userId: id
+        }
+      })
+    ])
+    await Promise.all([
+      customer ? this.prismaService.client.customer.delete({
+        where: {
+          userId: id
+        }
+      }) : null
+      ,
+      agency ? this.prismaService.client.agency.delete({
+        where: {
+          userId: id
+        }
+      }) : null
+    ])
+    const result = await this.prismaService.client.user.delete({
+      where: {
+        id
+      }
+    })
+    return result
   }
 }

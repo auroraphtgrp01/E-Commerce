@@ -25,10 +25,9 @@ model User {
   roles        String?
   createdAt    DateTime?      @default(now())
   updatedAt    DateTime?      @updatedAt
-  deletedAt    DateTime?
-  isDeleted    Boolean?       @default(false)
   createdBy    Json?
   updatedBy    Json?
+  deletedAt    DateTime?
   deletedBy    Json?
   Agency       Agency?
   Customer     Customer?
@@ -50,10 +49,9 @@ model Agency {
   citizenId     String
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
-  deletedAt     DateTime?
-  isDeleted     Boolean       @default(false)
   createdBy     Json?
   updatedBy     Json?
+  deletedAt     DateTime?
   deletedBy     Json?
   Rating        Rating[]
   Cart          Cart[]
@@ -67,10 +65,9 @@ model Customer {
   paymentCard PaymentCard[]
   createdAt   DateTime?     @default(now())
   updatedAt   DateTime?     @updatedAt
-  deletedAt   DateTime?
-  isDeleted   Boolean?      @default(false)
   createdBy   Json?
   updatedBy   Json?
+  deletedAt   DateTime?
   deletedBy   Json?
   Address     Address[]
 }
@@ -84,10 +81,9 @@ model PaymentCard {
   dueDate     DateTime
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
-  deletedAt   DateTime?
-  isDeleted   Boolean   @default(false)
   createdBy   Json?
   updatedBy   Json?
+  deletedAt   DateTime?
   deletedBy   Json?
   Customer    Customer? @relation(fields: [customerId], references: [id])
   customerId  String?   @db.Uuid
@@ -102,10 +98,9 @@ model Address {
   description String?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
-  deletedAt   DateTime?
-  isDeleted   Boolean   @default(false)
   createdBy   Json?
   updatedBy   Json?
+  deletedAt   DateTime?
   deletedBy   Json?
   Customer    Customer? @relation(fields: [customerId], references: [id])
   customerId  String?   @db.Uuid
@@ -121,10 +116,9 @@ model Role {
   permissions String[]
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
-  deletedAt   DateTime?
-  isDeleted   Boolean   @default(false)
   createdBy   Json?
   updatedBy   Json?
+  deletedAt   DateTime?
   deletedBy   Json?
 }
 
@@ -136,10 +130,9 @@ model Permission {
   description String
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
-  deletedAt   DateTime?
-  isDeleted   Boolean   @default(false)
   createdBy   Json?
   updatedBy   Json?
+  deletedAt   DateTime?
   deletedBy   Json?
 }
 
@@ -152,10 +145,9 @@ model Notification {
   status    String // Unread - Read
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
-  deletedAt DateTime?
-  isDeleted Boolean   @default(false)
   createdBy Json?
   updatedBy Json?
+  deletedAt DateTime?
   deletedBy Json?
 }
 
@@ -170,10 +162,9 @@ model Product {
   description String
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
-  deletedAt   DateTime?
-  isDeleted   Boolean    @default(false)
   createdBy   Json?
   updatedBy   Json?
+  deletedAt   DateTime?
   deletedBy   Json?
   Rating      Rating[]
   Cart        Cart[]
@@ -182,22 +173,22 @@ model Product {
 }
 
 model Variant {
-  id         String   @id @default(uuid()) @db.Uuid
+  id         String    @id @default(uuid()) @db.Uuid
   color      String
   type       String
   size       String
   price      Float
   quantities Int
-  idImg      String   @unique @db.Uuid
-  idProduct  String   @unique @db.Uuid
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  idImg      String    @unique @db.Uuid
+  idProduct  String    @unique @db.Uuid
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
   createdBy  String
   updatedBy  String
-  isDeleted  Boolean
+  deletedAt  DateTime?
   deletedBy  String
-  productId  String?  @db.Uuid
-  Product    Product? @relation(fields: [productId], references: [id])
+  productId  String?   @db.Uuid
+  Product    Product?  @relation(fields: [productId], references: [id])
 }
 
 model Category {
@@ -208,10 +199,9 @@ model Category {
   imageId     String    @unique @db.Uuid
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
-  deletedAt   DateTime?
-  isDeleted   Boolean   @default(false)
   createdBy   Json?
   updatedBy   Json?
+  deletedAt   DateTime?
   deletedBy   Json?
   Product     Product[]
 }
@@ -222,10 +212,9 @@ model Image {
   description String
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
-  deletedAt   DateTime?
-  isDeleted   Boolean   @default(false)
   createdBy   Json?
   updatedBy   Json?
+  deletedAt   DateTime?
   deletedBy   Json?
   User        User?     @relation(fields: [userId], references: [id])
   userId      String?   @unique @db.Uuid
@@ -243,10 +232,9 @@ model Rating {
   comment   String
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
-  deletedAt DateTime?
-  isDeleted Boolean   @default(false)
   createdBy Json?
   updatedBy Json?
+  deletedAt DateTime?
   deletedBy Json?
 }
 
@@ -262,10 +250,9 @@ model Cart {
   quantity       Int
   createdAt      DateTime         @default(now())
   updatedAt      DateTime         @updatedAt
-  deletedAt      DateTime?
-  isDeleted      Boolean          @default(false)
   createdBy      Json?
   updatedBy      Json?
+  deletedAt      DateTime?
   deletedBy      Json?
   Order          Order?           @relation(fields: [orderId], references: [id])
   orderId        String?          @db.Uuid
@@ -280,10 +267,9 @@ model CartItem {
   agencyId  String    @unique @db.Uuid
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
-  deletedAt DateTime?
-  isDeleted Boolean   @default(false)
   createdBy Json?
   updatedBy Json?
+  deletedAt DateTime?
   deletedBy Json?
   Cart      Cart?     @relation(fields: [cartId], references: [id])
   cartId    String?   @unique @db.Uuid
@@ -301,10 +287,9 @@ model Order {
   status        String
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
-  deletedAt     DateTime?
-  isDeleted     Boolean   @default(false)
   createdBy     Json?
   updatedBy     Json?
+  deletedAt     DateTime?
   deletedBy     Json?
 }
 
@@ -316,10 +301,9 @@ model Delivery {
   deliveryTime   String
   createdAt      DateTime         @default(now())
   updatedAt      DateTime         @updatedAt
-  deletedAt      DateTime?
-  isDeleted      Boolean          @default(false)
   createdBy      Json?
   updatedBy      Json?
+  deletedAt      DateTime?
   deletedBy      Json?
   DeliveryDetail DeliveryDetail[]
 }
@@ -333,9 +317,8 @@ model DeliveryDetail {
   orderId    String    @unique @db.Uuid
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
-  deletedAt  DateTime?
-  isDeleted  Boolean   @default(false)
   createdBy  Json?
   updatedBy  Json?
+  deletedAt  DateTime?
   deletedBy  Json?
 }

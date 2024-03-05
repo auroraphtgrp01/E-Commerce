@@ -1,9 +1,11 @@
-import { NestFactory, Reflector } from '@nestjs/core'
+import { HttpAdapterHost, NestFactory, Reflector } from '@nestjs/core'
 import { AppModule } from './app.module'
 import { ValidationPipe } from '@nestjs/common'
-import { ErorrHandlerInterceptor } from './core/errorHandler.interceptor'
+import { ErorrHandlerInterceptor } from './interceptors/errorHandler.interceptor'
 import { JwtAuthGuard } from './auth/jwt-auth.guard'
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
+import { PrismaClientExceptionFilter } from 'nestjs-prisma'
+import { TransformIntercepter } from './interceptors/transformer.interceptor'
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule)
@@ -11,6 +13,9 @@ async function bootstrap() {
   app.useGlobalInterceptors(new ErorrHandlerInterceptor())
   app.useGlobalPipes(new ValidationPipe())
   app.useGlobalGuards(new JwtAuthGuard(reflector))
+  const { httpAdapter } = app.get(HttpAdapterHost);
+  app.useGlobalFilters(new PrismaClientExceptionFilter(httpAdapter));
+  app.useGlobalInterceptors(new TransformIntercepter(reflector));
   const config = new DocumentBuilder()
     .setTitle('E-commerce API')
     .setDescription('The E-commerce API description')

@@ -1,22 +1,23 @@
 import aqp from 'api-query-params'
 import { PopulateOptions } from 'mongoose'
-import { PrismaServie } from 'src/services/prisma.service'
 
-const prismaService: PrismaServie = new PrismaServie()
 export const queryDatabaseWithFilter = async (queryString: string, modelQuery: any): Promise<object> => {
     const { filter, sort, projection, population, limit } = aqp(queryString as string)
     const limit_page = limit ? Number(limit) : 10
     const skip = filter.page ? (Number(filter.page) - 1) * limit : 0
-
+    const page = filter?.page
     delete filter.page
     if (!filter.isExactly) {
         Object.keys(filter).forEach((key) => {
             filter[key] = { contains: filter[key], mode: 'insensitive' }
         })
+    } else {
+        delete filter?.isExactly
     }
-    const queryFilter = {
+    const queryFilter = (Object.keys(filter).length !== 0) ? {
         OR: [JSON.parse(JSON.stringify(filter))]
-    }
+    } : {}
+
     delete filter.isExactly
     if (projection) {
         delete projection.password
@@ -45,10 +46,17 @@ export const queryDatabaseWithFilter = async (queryString: string, modelQuery: a
             createdAt: keySort
         }
     })
+    const count = await modelQuery.count({
+        where: queryFilter
+    })
     for (const key in result) {
         if (result[key].hasOwnProperty('password')) {
             delete result[key].password
         }
     }
-    return result
+    return {
+        page: page ? Number(page) : 1,
+        totalPage: Math.ceil(count / limit_page),
+        data: result
+    }
 }
