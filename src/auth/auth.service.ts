@@ -18,7 +18,7 @@ export class AuthService {
   async login(user: any) {
     const payload = {
       email: user.email,
-      sub: user._id
+      sub: user.id
     }
     const refreshToken = this.jwtService.sign({}, {
       secret: this.configService.get<string>('REFRESH_TOKEN_SECRET'),

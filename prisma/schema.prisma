@@ -111,13 +111,13 @@ model Address {
 model Role {
   id          String    @id @default(uuid()) @db.Uuid
   name        String
-  description String
-  isActive    Boolean
+  description String?
+  isActive    Boolean   @default(true)
   permissions String[]
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   createdBy   Json?
-  updatedBy   Json?
+  updatedBy   Json[]
   deletedAt   DateTime?
   deletedBy   Json?
 }
@@ -127,7 +127,7 @@ model Permission {
   name        String
   path        String
   method      String
-  description String
+  description String?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   createdBy   Json?

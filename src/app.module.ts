@@ -7,6 +7,8 @@ import { AuthModule } from './auth/auth.module'
 import { CustomPrismaModule, PrismaClientExceptionFilter, PrismaModule } from 'nestjs-prisma'
 import { extendedPrismaClient } from './services/prisma_customize.service'
 import { APP_FILTER, HttpAdapterHost } from '@nestjs/core'
+import { RolesModule } from './roles/roles.module';
+import { PermissionsModule } from './permissions/permissions.module';
 
 @Module({
   controllers: [AppController],
@@ -32,7 +34,9 @@ import { APP_FILTER, HttpAdapterHost } from '@nestjs/core'
         return extendedPrismaClient;
       },
       isGlobal: true,
-    })
+    }),
+    RolesModule,
+    PermissionsModule
   ]
 })
 export class AppModule { }

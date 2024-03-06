@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common'
 import { AuthService } from './auth.service'
 import { MongooseModule } from '@nestjs/mongoose'
-import { User, UserSchema } from 'src/users/schemas/user.schemas'
 import { AuthController } from './auth.controller'
 import { LocalStrategy } from './passports/local.strategy'
 import { JwtModule } from '@nestjs/jwt'
