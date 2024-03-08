@@ -3,10 +3,8 @@ import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
 import { ExtendedPrismaClient } from 'src/services/prisma_customize.service';
 import { CustomPrismaService } from 'nestjs-prisma';
-import { User } from '@prisma/client';
+import { Prisma, User } from '@prisma/client';
 import { queryDatabaseWithFilter } from 'src/utils/queryDatabase';
-import aqp from 'api-query-params';
-
 @Injectable()
 export class RolesService {
   constructor(@Inject('PrismaService') private readonly prismaService: CustomPrismaService<ExtendedPrismaClient>) { }
@@ -125,6 +123,31 @@ export class RolesService {
       },
       data: {
         deletedAt: null,
+      }
+    })
+  }
+  async deletePer(id: {
+    id_permission: string,
+    id_role: string
+  }, userInfo: User) {
+    return await this.prismaService.client.includePermission.delete({
+      where: {
+        permissionId: id.id_permission,
+        roleId: id.id_role
+      },
+    })
+  }
+  async grantPermission(id: {
+    id_permission: string,
+    id_role: string
+  }, userInfo: User) {
+    return await this.prismaService.client.includePermission.create({
+      data: {
+        permissionId: id.id_permission,
+        roleId: id.id_role,
+        createdBy: {
+          ...userInfo
+        }
       }
     })
   }

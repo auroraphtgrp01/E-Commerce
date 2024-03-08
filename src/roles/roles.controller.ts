@@ -69,4 +69,30 @@ export class RolesController {
   async restore(@Param('id') id: string, @UserInfo() userInfo: User) {
     return await this.rolesService.restore(id, userInfo);
   }
+  /*
+      * @Method: DELETE
+      * @Route : /roles/include-permission
+      * @Description:  Delete a permission from a role
+      * @Public: False
+      */
+  @Delete('include-permission/del')
+  async deletePer(@Body() id: {
+    id_permission: string,
+    id_role: string
+  }, @UserInfo() userInfo: User) {
+    return await this.rolesService.deletePer(id, userInfo);
+  }
+  /*
+      * @Method: DELETE
+      * @Route : /roles/include-permission
+      * @Description:  Delete a permission from a role
+      * @Public: False
+      */
+  @Post('include-permission/grant')
+  async grantPermission(@Body() id: {
+    id_permission: string,
+    id_role: string
+  }, @UserInfo() userInfo: User) {
+    return await this.rolesService.grantPermission(id, userInfo);
+  }
 }

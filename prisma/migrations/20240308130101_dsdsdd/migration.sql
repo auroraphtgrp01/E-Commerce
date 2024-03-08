@@ -8,13 +8,12 @@ CREATE TABLE "User" (
     "gender" TEXT NOT NULL,
     "dateOfBirth" TIMESTAMP(3) NOT NULL,
     "refreshToken" TEXT,
-    "roles" TEXT,
+    "roleId" UUID,
     "createdAt" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3),
-    "deletedAt" TIMESTAMP(3),
-    "isDeleted" BOOLEAN DEFAULT false,
     "createdBy" JSONB,
     "updatedBy" JSONB,
+    "deletedAt" TIMESTAMP(3),
     "deletedBy" JSONB,
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
@@ -24,17 +23,14 @@ CREATE TABLE "User" (
 CREATE TABLE "Agency" (
     "id" UUID NOT NULL,
     "userId" UUID NOT NULL,
-    "pickup_address" TEXT,
-    "paymentCard" TEXT[],
-    "shopName" TEXT,
-    "taxCode" TEXT,
-    "citizenId" TEXT,
+    "shopName" TEXT NOT NULL,
+    "taxCode" TEXT NOT NULL,
+    "citizenId" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
-    "deletedAt" TIMESTAMP(3),
-    "isDeleted" BOOLEAN NOT NULL DEFAULT false,
     "createdBy" JSONB,
     "updatedBy" JSONB,
+    "deletedAt" TIMESTAMP(3),
     "deletedBy" JSONB,
 
     CONSTRAINT "Agency_pkey" PRIMARY KEY ("id")
@@ -44,32 +40,65 @@ CREATE TABLE "Agency" (
 CREATE TABLE "Customer" (
     "id" UUID NOT NULL,
     "userId" UUID NOT NULL,
-    "paymentCard" TEXT[],
-    "address" TEXT[],
     "createdAt" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3),
-    "deletedAt" TIMESTAMP(3),
-    "isDeleted" BOOLEAN DEFAULT false,
     "createdBy" JSONB,
     "updatedBy" JSONB,
+    "deletedAt" TIMESTAMP(3),
     "deletedBy" JSONB,
 
     CONSTRAINT "Customer_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
-CREATE TABLE "Role" (
+CREATE TABLE "PaymentCard" (
     "id" UUID NOT NULL,
     "name" TEXT NOT NULL,
     "description" TEXT NOT NULL,
-    "isActive" BOOLEAN NOT NULL,
-    "permissions" TEXT[],
+    "cardNumber" TEXT NOT NULL,
+    "ccv" TEXT NOT NULL,
+    "dueDate" TIMESTAMP(3) NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
-    "deletedAt" TIMESTAMP(3),
-    "isDeleted" BOOLEAN NOT NULL DEFAULT false,
     "createdBy" JSONB,
     "updatedBy" JSONB,
+    "deletedAt" TIMESTAMP(3),
+    "deletedBy" JSONB,
+    "customerId" UUID,
+    "agencyId" UUID,
+
+    CONSTRAINT "PaymentCard_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Address" (
+    "id" UUID NOT NULL,
+    "name" TEXT NOT NULL,
+    "address" TEXT NOT NULL,
+    "description" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "createdBy" JSONB,
+    "updatedBy" JSONB,
+    "deletedAt" TIMESTAMP(3),
+    "deletedBy" JSONB,
+    "customerId" UUID,
+    "agencyId" UUID,
+
+    CONSTRAINT "Address_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Role" (
+    "id" UUID NOT NULL,
+    "name" TEXT NOT NULL,
+    "description" TEXT,
+    "isActive" BOOLEAN DEFAULT true,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "createdBy" JSONB,
+    "updatedBy" JSONB,
+    "deletedAt" TIMESTAMP(3),
     "deletedBy" JSONB,
 
     CONSTRAINT "Role_pkey" PRIMARY KEY ("id")
@@ -81,16 +110,30 @@ CREATE TABLE "Permission" (
     "name" TEXT NOT NULL,
     "path" TEXT NOT NULL,
     "method" TEXT NOT NULL,
-    "description" TEXT NOT NULL,
+    "description" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
-    "deletedAt" TIMESTAMP(3),
-    "isDeleted" BOOLEAN NOT NULL DEFAULT false,
     "createdBy" JSONB,
     "updatedBy" JSONB,
+    "deletedAt" TIMESTAMP(3),
     "deletedBy" JSONB,
 
     CONSTRAINT "Permission_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "IncludePermission" (
+    "id" UUID NOT NULL,
+    "roleId" UUID NOT NULL,
+    "permissionId" UUID NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "createdBy" JSONB,
+    "updatedBy" JSONB,
+    "deletedAt" TIMESTAMP(3),
+    "deletedBy" JSONB,
+
+    CONSTRAINT "IncludePermission_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -102,10 +145,9 @@ CREATE TABLE "Notification" (
     "status" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
-    "deletedAt" TIMESTAMP(3),
-    "isDeleted" BOOLEAN NOT NULL DEFAULT false,
     "createdBy" JSONB,
     "updatedBy" JSONB,
+    "deletedAt" TIMESTAMP(3),
     "deletedBy" JSONB,
 
     CONSTRAINT "Notification_pkey" PRIMARY KEY ("id")
@@ -122,10 +164,9 @@ CREATE TABLE "Product" (
     "description" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
-    "deletedAt" TIMESTAMP(3),
-    "isDeleted" BOOLEAN NOT NULL DEFAULT false,
     "createdBy" JSONB,
     "updatedBy" JSONB,
+    "deletedAt" TIMESTAMP(3),
     "deletedBy" JSONB,
 
     CONSTRAINT "Product_pkey" PRIMARY KEY ("id")
@@ -145,7 +186,7 @@ CREATE TABLE "Variant" (
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "createdBy" TEXT NOT NULL,
     "updatedBy" TEXT NOT NULL,
-    "isDeleted" BOOLEAN NOT NULL,
+    "deletedAt" TIMESTAMP(3),
     "deletedBy" TEXT NOT NULL,
     "productId" UUID,
 
@@ -161,10 +202,9 @@ CREATE TABLE "Category" (
     "imageId" UUID NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
-    "deletedAt" TIMESTAMP(3),
-    "isDeleted" BOOLEAN NOT NULL DEFAULT false,
     "createdBy" JSONB,
     "updatedBy" JSONB,
+    "deletedAt" TIMESTAMP(3),
     "deletedBy" JSONB,
 
     CONSTRAINT "Category_pkey" PRIMARY KEY ("id")
@@ -177,10 +217,9 @@ CREATE TABLE "Image" (
     "description" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
-    "deletedAt" TIMESTAMP(3),
-    "isDeleted" BOOLEAN NOT NULL DEFAULT false,
     "createdBy" JSONB,
     "updatedBy" JSONB,
+    "deletedAt" TIMESTAMP(3),
     "deletedBy" JSONB,
     "userId" UUID,
 
@@ -197,10 +236,9 @@ CREATE TABLE "Rating" (
     "comment" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
-    "deletedAt" TIMESTAMP(3),
-    "isDeleted" BOOLEAN NOT NULL DEFAULT false,
     "createdBy" JSONB,
     "updatedBy" JSONB,
+    "deletedAt" TIMESTAMP(3),
     "deletedBy" JSONB,
 
     CONSTRAINT "Rating_pkey" PRIMARY KEY ("id")
@@ -215,10 +253,9 @@ CREATE TABLE "Cart" (
     "quantity" INTEGER NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
-    "deletedAt" TIMESTAMP(3),
-    "isDeleted" BOOLEAN NOT NULL DEFAULT false,
     "createdBy" JSONB,
     "updatedBy" JSONB,
+    "deletedAt" TIMESTAMP(3),
     "deletedBy" JSONB,
     "orderId" UUID,
 
@@ -232,10 +269,9 @@ CREATE TABLE "CartItem" (
     "agencyId" UUID NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
-    "deletedAt" TIMESTAMP(3),
-    "isDeleted" BOOLEAN NOT NULL DEFAULT false,
     "createdBy" JSONB,
     "updatedBy" JSONB,
+    "deletedAt" TIMESTAMP(3),
     "deletedBy" JSONB,
     "cartId" UUID,
 
@@ -253,10 +289,9 @@ CREATE TABLE "Order" (
     "status" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
-    "deletedAt" TIMESTAMP(3),
-    "isDeleted" BOOLEAN NOT NULL DEFAULT false,
     "createdBy" JSONB,
     "updatedBy" JSONB,
+    "deletedAt" TIMESTAMP(3),
     "deletedBy" JSONB,
 
     CONSTRAINT "Order_pkey" PRIMARY KEY ("id")
@@ -271,10 +306,9 @@ CREATE TABLE "Delivery" (
     "deliveryTime" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
-    "deletedAt" TIMESTAMP(3),
-    "isDeleted" BOOLEAN NOT NULL DEFAULT false,
     "createdBy" JSONB,
     "updatedBy" JSONB,
+    "deletedAt" TIMESTAMP(3),
     "deletedBy" JSONB,
 
     CONSTRAINT "Delivery_pkey" PRIMARY KEY ("id")
@@ -288,10 +322,9 @@ CREATE TABLE "DeliveryDetail" (
     "orderId" UUID NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
-    "deletedAt" TIMESTAMP(3),
-    "isDeleted" BOOLEAN NOT NULL DEFAULT false,
     "createdBy" JSONB,
     "updatedBy" JSONB,
+    "deletedAt" TIMESTAMP(3),
     "deletedBy" JSONB,
 
     CONSTRAINT "DeliveryDetail_pkey" PRIMARY KEY ("id")
@@ -305,6 +338,9 @@ CREATE UNIQUE INDEX "Agency_userId_key" ON "Agency"("userId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Customer_userId_key" ON "Customer"("userId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "IncludePermission_permissionId_key" ON "IncludePermission"("permissionId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Notification_userId_key" ON "Notification"("userId");
@@ -367,10 +403,31 @@ CREATE UNIQUE INDEX "DeliveryDetail_cartId_key" ON "DeliveryDetail"("cartId");
 CREATE UNIQUE INDEX "DeliveryDetail_orderId_key" ON "DeliveryDetail"("orderId");
 
 -- AddForeignKey
+ALTER TABLE "User" ADD CONSTRAINT "User_roleId_fkey" FOREIGN KEY ("roleId") REFERENCES "Role"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "Agency" ADD CONSTRAINT "Agency_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Customer" ADD CONSTRAINT "Customer_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "PaymentCard" ADD CONSTRAINT "PaymentCard_customerId_fkey" FOREIGN KEY ("customerId") REFERENCES "Customer"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "PaymentCard" ADD CONSTRAINT "PaymentCard_agencyId_fkey" FOREIGN KEY ("agencyId") REFERENCES "Agency"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Address" ADD CONSTRAINT "Address_customerId_fkey" FOREIGN KEY ("customerId") REFERENCES "Customer"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Address" ADD CONSTRAINT "Address_agencyId_fkey" FOREIGN KEY ("agencyId") REFERENCES "Agency"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "IncludePermission" ADD CONSTRAINT "IncludePermission_roleId_fkey" FOREIGN KEY ("roleId") REFERENCES "Role"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "IncludePermission" ADD CONSTRAINT "IncludePermission_permissionId_fkey" FOREIGN KEY ("permissionId") REFERENCES "Permission"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Notification" ADD CONSTRAINT "Notification_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

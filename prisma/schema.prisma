@@ -22,7 +22,8 @@ model User {
   gender       String
   dateOfBirth  DateTime
   refreshToken String?
-  roles        String?
+  Role         Role?          @relation(fields: [roleId], references: [id])
+  roleId       String?        @db.Uuid
   createdAt    DateTime?      @default(now())
   updatedAt    DateTime?      @updatedAt
   createdBy    Json?
@@ -120,6 +121,7 @@ model Role {
   updatedBy   Json?
   deletedAt   DateTime?
   deletedBy   Json?
+  User        User[]
 }
 
 model Permission {
@@ -143,6 +145,12 @@ model IncludePermission {
   roleId       String     @db.Uuid
   Permission   Permission @relation(fields: [permissionId], references: [id])
   permissionId String     @unique @db.Uuid
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  createdBy    Json?
+  updatedBy    Json?
+  deletedAt    DateTime?
+  deletedBy    Json?
 }
 
 model Notification {
