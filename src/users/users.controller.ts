@@ -1,10 +1,11 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query } from '@nestjs/common'
 import { UsersService } from './users.service'
-import { AddressDto, CreateUserDto, RegisterAgency, RegisterCustomer } from './dto/create-user.dto'
+import { AddressDto, CreateUserDto, GrantRole, RegisterAgency, RegisterCustomer } from './dto/create-user.dto'
 import { UpdateAgencyDto, UpdateUserDto } from './dto/update-user.dto'
 import { Public } from 'src/decorators/auth.decorator'
 import { ApiTags } from '@nestjs/swagger'
-import { ResponseMessage } from 'src/decorators/customize.decorator'
+import { ResponseMessage, UserInfo } from 'src/decorators/customize.decorator'
+import { User } from '@prisma/client'
 @ApiTags('Users')
 @Controller('users')
 export class UsersController {
@@ -120,5 +121,17 @@ export class UsersController {
   @Delete(':id')
   async remove(@Param('id') id: string) {
     return await this.usersService.removeUser(id)
+  }
+  /*
+      * @Method: POST
+      * @Route : /grant-role/:id
+      * @Description: Grant Role to User
+      * @Public: false
+      */
+  @Post('grant-role')
+  async grantRole(@Body() grandRole: GrantRole, @UserInfo() userInfo: User) {
+    console.log(userInfo);
+
+    return await this.usersService.grantRole(grandRole, userInfo)
   }
 }

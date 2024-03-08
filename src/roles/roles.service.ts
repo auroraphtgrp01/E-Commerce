@@ -147,7 +147,7 @@ export class RolesService {
         roleId: id.id_role,
         createdBy: {
           ...userInfo
-        }
+        },
       }
     })
   }

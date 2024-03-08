@@ -48,3 +48,10 @@ export class AddressDto {
   @IsNotEmpty({ message: MESSAGES_RESPONSE.ID_USERS_IS_REQUIRED })
   userId: string
 }
+
+export class GrantRole {
+  @IsNotEmpty({ message: MESSAGES_RESPONSE.ID_USERS_IS_REQUIRED })
+  userId: string
+  @IsNotEmpty({ message: MESSAGES_RESPONSE.ID_ROLE_IS_REQUIRED })
+  roleId: string
+}

@@ -7,6 +7,7 @@ import { JwtModule } from '@nestjs/jwt'
 import { ConfigService } from '@nestjs/config'
 import { JwtStrategy } from './passports/jwt.strategy'
 import { UsersModule } from 'src/users/users.module'
+import { RolesModule } from 'src/roles/roles.module'
 
 @Module({
   imports: [
@@ -16,7 +17,7 @@ import { UsersModule } from 'src/users/users.module'
         signOptions: { expiresIn: '50d' }
       }),
       inject: [ConfigService]
-    }), UsersModule
+    }), UsersModule, RolesModule
   ],
   providers: [AuthService, LocalStrategy, JwtStrategy],
   controllers: [AuthController]

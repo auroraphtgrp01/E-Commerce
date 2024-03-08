@@ -1,11 +1,11 @@
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common'
-import { AddressDto, RegisterAgency, RegisterCustomer } from './dto/create-user.dto'
+import { AddressDto, GrantRole, RegisterAgency, RegisterCustomer } from './dto/create-user.dto'
 import { UpdateAgencyDto, UpdateUserDto } from './dto/update-user.dto'
 import { hashPassword } from 'src/utils/hashPassword'
 import aqp from 'api-query-params'
 import { PopulateOptions } from 'mongoose'
 import { queryDatabaseWithFilter } from 'src/utils/queryDatabase'
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient, User } from '@prisma/client'
 import { CustomPrismaService } from 'nestjs-prisma'
 import { ExtendedPrismaClient } from 'src/services/prisma_customize.service'
 
@@ -308,5 +308,38 @@ export class UsersService {
       }
     })
     return true
+  }
+  async grantRole(id: GrantRole, userInfo: User) {
+    return await this.prismaService.client.user.update({
+      where: {
+        id: id.userId
+      },
+      data: {
+        roleId: id.roleId,
+        createdBy: {
+          ...userInfo
+        }
+      }
+    })
+  }
+  async getPermisisonsWithID(id: string) {
+    const permission = await this.prismaService.client.includePermission.findMany({
+      where: {
+        roleId: id
+      },
+      include: {
+        Permission: {
+          select: {
+            name: true,
+            path: true,
+            method: true
+          }
+        }
+      }
+    })
+    const result = permission.map((item) => {
+      return item.Permission
+    })
+    return result
   }
 }
