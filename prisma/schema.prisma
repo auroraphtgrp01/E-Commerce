@@ -109,31 +109,40 @@ model Address {
 }
 
 model Role {
-  id          String    @id @default(uuid()) @db.Uuid
+  id          String              @id @default(uuid()) @db.Uuid
   name        String
   description String?
-  isActive    Boolean   @default(true)
-  permissions String[]
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  isActive    Boolean?            @default(true)
+  Permission  IncludePermission[]
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
   createdBy   Json?
-  updatedBy   Json[]
+  updatedBy   Json?
   deletedAt   DateTime?
   deletedBy   Json?
 }
 
 model Permission {
-  id          String    @id @default(uuid()) @db.Uuid
-  name        String
-  path        String
-  method      String
-  description String?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  createdBy   Json?
-  updatedBy   Json?
-  deletedAt   DateTime?
-  deletedBy   Json?
+  id                String             @id @default(uuid()) @db.Uuid
+  name              String
+  path              String
+  method            String
+  description       String?
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  createdBy         Json?
+  updatedBy         Json?
+  deletedAt         DateTime?
+  deletedBy         Json?
+  IncludePermission IncludePermission?
+}
+
+model IncludePermission {
+  id           String     @id @default(uuid()) @db.Uuid
+  Role         Role       @relation(fields: [roleId], references: [id])
+  roleId       String     @db.Uuid
+  Permission   Permission @relation(fields: [permissionId], references: [id])
+  permissionId String     @unique @db.Uuid
 }
 
 model Notification {

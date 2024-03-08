@@ -1,8 +1,9 @@
 import aqp from 'api-query-params'
 import { PopulateOptions } from 'mongoose'
 
-export const queryDatabaseWithFilter = async (queryString: string, modelQuery: any): Promise<object> => {
+export const queryDatabaseWithFilter = async (queryString: string, modelQuery: any, customePopulate?: any): Promise<object> => {
     const { filter, sort, projection, population, limit } = aqp(queryString as string)
+    const isIncludePopulate = filter.includePopulate
     const limit_page = limit ? Number(limit) : 10
     const skip = filter.page ? (Number(filter.page) - 1) * limit : 0
     const page = filter?.page
@@ -14,9 +15,6 @@ export const queryDatabaseWithFilter = async (queryString: string, modelQuery: a
     } else {
         delete filter?.isExactly
     }
-    const queryFilter = (Object.keys(filter).length !== 0) ? {
-        OR: [JSON.parse(JSON.stringify(filter))]
-    } : {}
 
     delete filter.isExactly
     if (projection) {
@@ -31,12 +29,23 @@ export const queryDatabaseWithFilter = async (queryString: string, modelQuery: a
             keySort = Object.keys(sort).toString()
         }
     }
-    const populate = population
-        ? population.reduce((acc: object, curr: PopulateOptions) => {
-            acc[curr.path.trim()] = true
-            return acc
-        }, {})
-        : {}
+    let populate: any = {}
+    if (customePopulate && isIncludePopulate) {
+        populate = customePopulate
+    } else {
+        populate = population
+            ? population.reduce((acc: object, curr: PopulateOptions) => {
+                acc[curr.path.trim()] = true
+                return acc
+            }, {})
+            : {}
+    }
+
+    delete filter.includePopulate
+    const queryFilter = (Object.keys(filter).length !== 0) ? {
+        OR: [JSON.parse(JSON.stringify(filter))]
+    } : {}
+
     const result = await modelQuery.findMany({
         take: limit_page,
         skip,

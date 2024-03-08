@@ -6,7 +6,7 @@ export class CreateRoleDto {
     @IsOptional()
     @IsString({ message: 'Description must be a string' })
     description: string
-    @IsArray({ message: 'Permissions must be an array' })
     @IsString({ each: true, message: 'Each permission must be a string' })
+    @IsArray({ message: 'Permissions must be an array' })
     permissions: string[]
 }
