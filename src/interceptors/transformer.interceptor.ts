@@ -2,7 +2,7 @@ import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from "@nes
 import { Reflector } from "@nestjs/core";
 import { Observable, map } from "rxjs";
 import { RESPONSE_MESSAGE } from "src/decorators/customize.decorator";
-
+import { filterObject } from "src/utils/filterNestedObject";
 export interface Response {
     statusCode: number;
     message: string;
@@ -10,6 +10,7 @@ export interface Response {
     meta: object
 }
 
+const keysToRemove = ["createdAt", "updatedAt", "deletedAt", 'updatedBy', 'createdBy', 'password', 'deletedBy']
 @Injectable()
 export class TransformIntercepter<T> implements NestInterceptor<T, Response> {
     constructor(private readonly reflector: Reflector) { }
@@ -19,10 +20,11 @@ export class TransformIntercepter<T> implements NestInterceptor<T, Response> {
                 statusCode: context.switchToHttp().getResponse().statusCode,
                 message: this.reflector.get<string>(RESPONSE_MESSAGE, context.getHandler()) || 'API RESPONSE',
                 data: {
-                    result: data?.result || data,
+                    result: filterObject(data, keysToRemove),
                 },
                 meta: data?.meta || {}
             }))
         )
     }
 }
+
