@@ -1,8 +1,7 @@
-import { IsDate, IsDateString, IsEmail, IsEmpty, IsNotEmpty, IsOptional } from 'class-validator'
-import mongoose from 'mongoose'
+import { IsDateString, IsEmail, IsNotEmpty, IsOptional } from 'class-validator'
 import { MESSAGES_RESPONSE } from 'src/constants/messages'
 
-export class CreateUserDto { }
+export class CreateUserDto {}
 
 export class RegisterCustomer {
   @IsEmail({}, { message: MESSAGES_RESPONSE.INVALID_EMAIL })

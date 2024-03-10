@@ -6,7 +6,7 @@ import { ResponseMessage } from 'src/decorators/customize.decorator'
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) { }
+  constructor(private readonly authService: AuthService) {}
   @ResponseMessage('User Login API')
   @UseGuards(LocalAuthGuard)
   @Public()

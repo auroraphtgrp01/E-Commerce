@@ -11,8 +11,10 @@ import { ExtendedPrismaClient } from 'src/services/prisma_customize.service'
 
 @Injectable()
 export class UsersService {
-  constructor(@Inject('PrismaService')
-  private prismaService: CustomPrismaService<ExtendedPrismaClient>) { }
+  constructor(
+    @Inject('PrismaService')
+    private prismaService: CustomPrismaService<ExtendedPrismaClient>
+  ) {}
 
   async register(registerCustomer: RegisterCustomer) {
     const isExist = await this.prismaService.client.user.findUnique({
@@ -56,27 +58,31 @@ export class UsersService {
     const isValid = await this.prismaService.client.user.findUnique({
       where: {
         id: registerAgency.userId
-      }, select: {
+      },
+      select: {
         id: true,
         password: false,
         email: true,
-        name: true,
+        name: true
       }
     })
-    console.log(isValid);
     const pickupAddress = registerAgency.pickupAddress
     delete registerAgency.pickupAddress
-    if (!isValid) throw new HttpException('User not found - Please Register a new User to Register Agency !', HttpStatus.UNAUTHORIZED)
+    if (!isValid)
+      throw new HttpException(
+        'User not found - Please Register a new User to Register Agency !',
+        HttpStatus.UNAUTHORIZED
+      )
     const result = await this.prismaService.client.agency.create({
       data: {
-        ...registerAgency as any
+        ...(registerAgency as any)
       }
     })
     await this.prismaService.client.address.create({
       data: {
         agencyId: result.id,
         address: pickupAddress,
-        name: 'Pickup Address',
+        name: 'Pickup Address'
       }
     })
     return {
@@ -136,8 +142,9 @@ export class UsersService {
     const result = await this.prismaService.client.agency.update({
       where: {
         id
-      }, data: {
-        ...updateAgencyDto as any
+      },
+      data: {
+        ...(updateAgencyDto as any)
       }
     })
     return {
@@ -279,17 +286,20 @@ export class UsersService {
       })
     ])
     await Promise.all([
-      customer ? this.prismaService.client.customer.delete({
-        where: {
-          userId: id
-        }
-      }) : null
-      ,
-      agency ? this.prismaService.client.agency.delete({
-        where: {
-          userId: id
-        }
-      }) : null
+      customer
+        ? this.prismaService.client.customer.delete({
+            where: {
+              userId: id
+            }
+          })
+        : null,
+      agency
+        ? this.prismaService.client.agency.delete({
+            where: {
+              userId: id
+            }
+          })
+        : null
     ])
     const result = await this.prismaService.client.user.delete({
       where: {

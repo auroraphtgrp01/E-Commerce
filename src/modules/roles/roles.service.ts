@@ -1,13 +1,13 @@
-import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { CreateRoleDto } from './dto/create-role.dto';
-import { UpdateRoleDto } from './dto/update-role.dto';
-import { ExtendedPrismaClient } from 'src/services/prisma_customize.service';
-import { CustomPrismaService } from 'nestjs-prisma';
-import { Prisma, User } from '@prisma/client';
-import { queryDatabaseWithFilter } from 'src/utils/queryDatabase';
+import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common'
+import { CreateRoleDto } from './dto/create-role.dto'
+import { UpdateRoleDto } from './dto/update-role.dto'
+import { ExtendedPrismaClient } from 'src/services/prisma_customize.service'
+import { CustomPrismaService } from 'nestjs-prisma'
+import { User } from '@prisma/client'
+import { queryDatabaseWithFilter } from 'src/utils/queryDatabase'
 @Injectable()
 export class RolesService {
-  constructor(@Inject('PrismaService') private readonly prismaService: CustomPrismaService<ExtendedPrismaClient>) { }
+  constructor(@Inject('PrismaService') private readonly prismaService: CustomPrismaService<ExtendedPrismaClient>) {}
   async create(createRoleDto: CreateRoleDto, userInfo: User) {
     const isExits = await this.prismaService.client.role.findFirst({
       where: {
@@ -75,7 +75,7 @@ export class RolesService {
         name: updateRoleDto.name,
         description: updateRoleDto.description,
         updatedBy: {
-          ...userInfo as any
+          ...(userInfo as any)
         }
       }
     })
@@ -104,17 +104,20 @@ export class RolesService {
     }
   }
   async restore(id: string, userInfo: User) {
-    if ((await this.prismaService.client.role.findFirst({
-      where: {
-        AND: [
-          {
-            id
-          }, {
-            deletedAt: null
-          }
-        ]
-      }
-    }))) {
+    if (
+      await this.prismaService.client.role.findFirst({
+        where: {
+          AND: [
+            {
+              id
+            },
+            {
+              deletedAt: null
+            }
+          ]
+        }
+      })
+    ) {
       throw new HttpException('Role not found', HttpStatus.NOT_FOUND)
     }
     return await this.prismaService.client.role.update({
@@ -122,33 +125,57 @@ export class RolesService {
         id
       },
       data: {
-        deletedAt: null,
+        deletedAt: null
       }
     })
   }
-  async deletePer(id: {
-    id_permission: string,
-    id_role: string
-  }, userInfo: User) {
+  async deletePer(
+    id: {
+      id_permission: string
+      id_role: string
+    },
+    userInfo: User
+  ) {
     return await this.prismaService.client.includePermission.delete({
       where: {
         permissionId: id.id_permission,
         roleId: id.id_role
-      },
+      }
     })
   }
-  async grantPermission(id: {
-    id_permission: string,
-    id_role: string
-  }, userInfo: User) {
+  async grantPermission(
+    id: {
+      id_permission: string
+      id_role: string
+    },
+    userInfo: User
+  ) {
     return await this.prismaService.client.includePermission.create({
       data: {
         permissionId: id.id_permission,
         roleId: id.id_role,
         createdBy: {
           ...userInfo
-        },
+        }
       }
     })
+  }
+  async getAllPermission(roleID: string) {
+    const permisisons = await this.prismaService.client.includePermission.findMany({
+      where: {
+        roleId: roleID
+      },
+      include: {
+        Permission: true
+      }
+    })
+    const permissionArr = permisisons.map((item) => {
+      return {
+        name: item.Permission.name,
+        path: item.Permission.path,
+        method: item.Permission.method
+      }
+    })
+    return permissionArr
   }
 }

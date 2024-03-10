@@ -18,4 +18,5 @@ export const MESSAGES_RESPONSE = {
   ID_USERS_IS_REQUIRED: 'Id users is required',
   ADDRESS_IS_REQUIRED: 'Address is required',
   ID_ROLE_IS_REQUIRED: 'Id role is required',
+  FORBIDDEN: 'Forbidden - You Cannot Access to this Endpoint'
 }

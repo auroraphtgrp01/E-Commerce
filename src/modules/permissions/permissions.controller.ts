@@ -1,13 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
-import { PermissionsService } from './permissions.service';
-import { CreatePermissionDto } from './dto/create-permission.dto';
-import { UpdatePermissionDto } from './dto/update-permission.dto';
-import { UserInfo } from 'src/decorators/customize.decorator';
-import { User } from '@prisma/client';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common'
+import { PermissionsService } from './permissions.service'
+import { CreatePermissionDto } from './dto/create-permission.dto'
+import { UpdatePermissionDto } from './dto/update-permission.dto'
+import { UserInfo } from 'src/decorators/customize.decorator'
+import { User } from '@prisma/client'
 
 @Controller('permissions')
 export class PermissionsController {
-  constructor(private readonly permissionsService: PermissionsService) { }
+  constructor(private readonly permissionsService: PermissionsService) {}
   /*
    * @Method: POST
    * @Route : /permissions
@@ -16,7 +16,7 @@ export class PermissionsController {
    */
   @Post()
   async create(@Body() createPermissionDto: CreatePermissionDto) {
-    return await this.permissionsService.create(createPermissionDto);
+    return await this.permissionsService.create(createPermissionDto)
   }
   /*
    * @Method: GET
@@ -26,7 +26,7 @@ export class PermissionsController {
    */
   @Get()
   async findAll(@Query() queryString: string) {
-    return await this.permissionsService.findAll(queryString);
+    return await this.permissionsService.findAll(queryString)
   }
   /*
    * @Method: GET
@@ -36,7 +36,7 @@ export class PermissionsController {
    */
   @Get(':id')
   async findOne(@Param('id') id: string) {
-    return await this.permissionsService.findOne(id);
+    return await this.permissionsService.findOne(id)
   }
   /*
    * @Method: PATCH
@@ -46,7 +46,7 @@ export class PermissionsController {
    */
   @Patch(':id')
   async update(@Param('id') id: string, @Body() updatePermissionDto: UpdatePermissionDto, @UserInfo() userInfo: User) {
-    return await this.permissionsService.update(id, updatePermissionDto, userInfo);
+    return await this.permissionsService.update(id, updatePermissionDto, userInfo)
   }
   /*
    * @Method: DELETE
@@ -56,7 +56,7 @@ export class PermissionsController {
    */
   @Delete(':id')
   async remove(@Param('id') id: string, @UserInfo() userInfo: User) {
-    return await this.permissionsService.remove(id, userInfo);
+    return await this.permissionsService.remove(id, userInfo)
   }
   /*
    * @Method: PATCH
@@ -66,6 +66,6 @@ export class PermissionsController {
    */
   @Patch('restore/:id')
   async restore(@Param('id') id: string, @UserInfo() userInfo: User) {
-    return await this.permissionsService.restore(id, userInfo);
+    return await this.permissionsService.restore(id, userInfo)
   }
 }

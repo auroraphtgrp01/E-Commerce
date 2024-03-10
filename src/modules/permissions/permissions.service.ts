@@ -1,14 +1,14 @@
-import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { CreatePermissionDto } from './dto/create-permission.dto';
-import { UpdatePermissionDto } from './dto/update-permission.dto';
-import { CustomPrismaService } from 'nestjs-prisma';
-import { ExtendedPrismaClient } from 'src/services/prisma_customize.service';
-import { queryDatabaseWithFilter } from 'src/utils/queryDatabase';
-import { User } from '@prisma/client';
+import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common'
+import { CreatePermissionDto } from './dto/create-permission.dto'
+import { UpdatePermissionDto } from './dto/update-permission.dto'
+import { CustomPrismaService } from 'nestjs-prisma'
+import { ExtendedPrismaClient } from 'src/services/prisma_customize.service'
+import { queryDatabaseWithFilter } from 'src/utils/queryDatabase'
+import { User } from '@prisma/client'
 
 @Injectable()
 export class PermissionsService {
-  constructor(@Inject('PrismaService') private readonly prismaService: CustomPrismaService<ExtendedPrismaClient>) { }
+  constructor(@Inject('PrismaService') private readonly prismaService: CustomPrismaService<ExtendedPrismaClient>) {}
   async create(createPermissionDto: CreatePermissionDto) {
     const isExist = await this.prismaService.client.permission.findFirst({
       where: {
@@ -83,7 +83,7 @@ export class PermissionsService {
         id
       },
       data: {
-        deletedAt: null,
+        deletedAt: null
       }
     })
   }
