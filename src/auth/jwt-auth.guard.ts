@@ -34,6 +34,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     if (err || !user) {
       throw err || new UnauthorizedException('This is a protected route. Please provide a valid token.')
     }
+    return user
     const request: Request = context.switchToHttp().getRequest()
     const targetMethod = request.method
     const targetEndpoint = request?.route.path

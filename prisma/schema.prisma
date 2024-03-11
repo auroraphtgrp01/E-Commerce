@@ -14,29 +14,69 @@ datasource db {
 }
 
 model User {
-  id           String         @id @default(uuid()) @db.Uuid
-  name         String
-  email        String         @unique
-  password     String
-  phone        String
-  gender       String
-  dateOfBirth  DateTime
-  refreshToken String?
-  Role         Role?          @relation(fields: [roleId], references: [id])
-  roleId       String?        @db.Uuid
-  createdAt    DateTime?      @default(now())
-  updatedAt    DateTime?      @updatedAt
-  createdBy    Json?
-  updatedBy    Json?
-  deletedAt    DateTime?
-  deletedBy    Json?
-  Agency       Agency?
-  Customer     Customer?
-  Notification Notification[]
-  Rating       Rating[]
-  Cart         Cart[]
-  Order        Order[]
-  Image        Image[]
+  id               String         @id @default(uuid()) @db.Uuid
+  name             String
+  email            String         @unique
+  password         String
+  phone            String
+  gender           String
+  dateOfBirth      DateTime
+  refreshToken     String?
+  Role             Role?          @relation(fields: [roleId], references: [id])
+  roleId           String?        @db.Uuid
+  createdAt        DateTime?      @default(now())
+  updatedAt        DateTime?      @updatedAt
+  createdBy        Json?
+  updatedBy        Json?
+  deletedAt        DateTime?
+  deletedBy        Json?
+  Agency           Agency?
+  Customer         Customer?
+  Notification     Notification[]
+  Rating           Rating[]
+  Cart             Cart[]
+  Order            Order[]
+  Image            Image[]
+  Conversation     Conversation?  @relation(fields: [conversationId], references: [id])
+  conversationId   String?        @db.Uuid
+  sentMessages     Message[]      @relation("Sender")
+  receivedMessages Message[]      @relation("Recipient")
+}
+
+model Message {
+  id             String           @id @default(uuid()) @db.Uuid
+  text           String
+  sender         User             @relation("Sender", fields: [senderId], references: [id])
+  senderId       String           @db.Uuid
+  recipient      User             @relation("Recipient", fields: [recipientId], references: [id])
+  recipientId    String           @db.Uuid
+  role           RoleConversation
+  createdAt      DateTime         @default(now())
+  conversationId String           @db.Uuid
+  conversation   Conversation     @relation(fields: [conversationId], references: [id])
+  updatedAt      DateTime         @updatedAt
+  createdBy      Json?
+  updatedBy      Json?
+  deletedAt      DateTime?
+  deletedBy      Json?
+}
+
+model Conversation {
+  id        String    @id @default(uuid()) @db.Uuid
+  messages  Message[]
+  User      User[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  createdBy Json?
+  updatedBy Json?
+  deletedAt DateTime?
+  deletedBy Json?
+}
+
+enum RoleConversation {
+  CUSTOMER
+  AGENCY
+  ADMIN
 }
 
 model Agency {

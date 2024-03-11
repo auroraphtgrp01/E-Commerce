@@ -14,7 +14,7 @@ export class UsersService {
   constructor(
     @Inject('PrismaService')
     private prismaService: CustomPrismaService<ExtendedPrismaClient>
-  ) {}
+  ) { }
 
   async register(registerCustomer: RegisterCustomer) {
     const isExist = await this.prismaService.client.user.findUnique({
@@ -288,17 +288,17 @@ export class UsersService {
     await Promise.all([
       customer
         ? this.prismaService.client.customer.delete({
-            where: {
-              userId: id
-            }
-          })
+          where: {
+            userId: id
+          }
+        })
         : null,
       agency
         ? this.prismaService.client.agency.delete({
-            where: {
-              userId: id
-            }
-          })
+          where: {
+            userId: id
+          }
+        })
         : null
     ])
     const result = await this.prismaService.client.user.delete({
@@ -351,5 +351,25 @@ export class UsersService {
       return item.Permission
     })
     return result
+  }
+  async handleConversation(senderID: string, recipientId: string, role: string) {
+    if (role === 'CUSTOMER') {
+      const isAgency = await this.prismaService.client.agency.findFirst({
+        where: {
+          userId: recipientId
+        }
+      })
+      if (isAgency === null) return false
+      return true
+    }
+    if (role === 'AGENCY') {
+      const isAgency = await this.prismaService.client.agency.findFirst({
+        where: {
+          userId: senderID
+        }
+      })
+      if (isAgency === null) return false
+      return true
+    }
   }
 }

@@ -12,7 +12,7 @@ export class AuthService {
     private readonly userService: UsersService,
     private configService: ConfigService,
     private readonly roleService: RolesService
-  ) {}
+  ) { }
   async validateUser(email: string, password: string): Promise<any> {
     const user = await this.userService.findUserByEmail(email)
     const isValid = comparePassword(password, user.password)
@@ -22,13 +22,17 @@ export class AuthService {
     return user
   }
   async login(user: any) {
-    const role = await this.roleService.findOne(user.roleId)
+    let role = null
+    if (user.role) {
+      role = await this.roleService.findOne(user.roleId)
+    }
     const payload = {
+      id: user.id,
       email: user.email,
       sub: user.id,
       role: {
-        id: role.id,
-        name: role.name
+        id: user.role ? role.id : null,
+        name: user.role ? role.id : null
       }
     }
     const refreshToken = this.jwtService.sign(
@@ -51,5 +55,10 @@ export class AuthService {
     return {
       message: 'User logout successfully'
     }
+  }
+  async validateToken(token: string) {
+    return await this.jwtService.verify(token, {
+      secret: this.configService.get<string>('ACCESS_TOKEN_SECRET')
+    })
   }
 }

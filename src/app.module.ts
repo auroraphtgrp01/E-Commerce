@@ -9,6 +9,8 @@ import { extendedPrismaClient } from './services/prisma_customize.service'
 import { APP_FILTER, HttpAdapterHost } from '@nestjs/core'
 import { RolesModule } from './modules/roles/roles.module'
 import { PermissionsModule } from './modules/permissions/permissions.module'
+import { ConversationsModule } from './modules/conversations/conversations.module'
+import { EventGateway } from './event.gateway'
 
 @Module({
   controllers: [AppController],
@@ -20,7 +22,8 @@ import { PermissionsModule } from './modules/permissions/permissions.module'
       },
       inject: [HttpAdapterHost]
     },
-    AppService
+    AppService,
+    EventGateway,
   ],
   imports: [
     UsersModule,
@@ -37,7 +40,8 @@ import { PermissionsModule } from './modules/permissions/permissions.module'
       isGlobal: true
     }),
     RolesModule,
-    PermissionsModule
+    PermissionsModule,
+    ConversationsModule
   ]
 })
-export class AppModule {}
+export class AppModule { }
